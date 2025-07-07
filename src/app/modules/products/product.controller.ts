@@ -67,3 +67,32 @@ productRouter.get("/:id", async (req: Request, res: Response) => {
     });
   }
 });
+
+// DELETE a product by ID
+productRouter.delete("/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const deletedProduct = await Product.findByIdAndDelete(id);
+
+    if (!deletedProduct) {
+      res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Product deleted successfully",
+      data: deletedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting product",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+});
+
+
