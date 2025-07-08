@@ -3,21 +3,93 @@ import { Cart } from "./cart.model";
 
 export const CartRouter = express.Router();
 
-// POST create new product
+// 🔹 GET all cart items
+CartRouter.get("/", async (_req: Request, res: Response) => {
+  try {
+    const cartItems = await Cart.find();
+    res.status(200).json({
+      success: true,
+      message: "Cart items retrieved successfully",
+      data: cartItems,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to get cart items",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+});
+
+// 🔹 POST add item to cart
 CartRouter.post("/", async (req: Request, res: Response) => {
   try {
-    const productData = req.body;
-    const newProduct = await Cart.create(productData);
-
+    const newCartItem = await Cart.create(req.body);
     res.status(201).json({
-      message: "Product add to Cart Successfully",
       success: true,
-      data: newProduct,
+      message: "Item added to cart",
+      data: newCartItem,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Failed to add to cart",
+      message: "Failed to add item to cart",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+});
+
+// 🔹 DELETE cart item by ID
+CartRouter.delete("/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const deletedItem = await Cart.findByIdAndDelete(id);
+    if (!deletedItem) {
+      res.status(404).json({
+        success: false,
+        message: "Cart item not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Item removed from cart",
+      data: deletedItem,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete cart item",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+});
+
+// PATCH: update quantity
+CartRouter.patch("/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    const updated = await Cart.findByIdAndUpdate(
+      id,
+      { quantity },
+      { new: true }
+    );
+
+    if (!updated) {
+      res.status(404).json({ success: false, message: "Item not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Quantity updated successfully",
+      data: updated,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to update quantity",
       error: error instanceof Error ? error.message : error,
     });
   }

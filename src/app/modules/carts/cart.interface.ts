@@ -5,5 +5,6 @@ export interface ICartProduct {
   price: number;
   image: string;
   createdAt?: string;
+  quantity?: number;
   updatedAt?: string;
 }

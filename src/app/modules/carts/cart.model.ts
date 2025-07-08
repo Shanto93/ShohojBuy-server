@@ -22,6 +22,7 @@ const cartSchema = new mongoose.Schema<ICartProduct>(
       required: [true, "Image URL is required"],
       trim: true,
     },
+    quantity: { type: Number, default: 1 },
   },
   {
     timestamps: true,
